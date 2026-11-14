@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en" data-type="place">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMzQTBCMTciLz48cGF0aCBkPSJNMTQgNTRWMzBDMTQgMTggMjIgMTAgMzIgMTBzMTggOCAxOCAyMHYyNHoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0M5QTI0QiIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHBhdGggZD0iTTIyIDU0VjMyYzAtNiA0LTEwIDEwLTEwczEwIDQgMTAgMTB2MjJ6IiBmaWxsPSIjRTlCOEEzIi8+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMy41IiBmaWxsPSIjM0EwQjE3Ii8+PHBhdGggZD0iTTI2IDU0VjQwaDEydjE0eiIgZmlsbD0iIzNBMEIxNyIvPjwvc3ZnPg==">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="shortcut icon" href="favicon.ico">
+<title>Jaipur, the Pink City: places, food and a plan for your trip</title>
+<meta name="description" content="A practical, beautiful guide to Jaipur: forts, bazaars, local food joints, a trip planner and a budget calculator.">
+<meta name="theme-color" content="#3A0B17">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --m9:#240510; --m8:#3A0B17; --wine:#5E1A2D; --rose:#E9B8A3; --sand:#F4D8CA;
+  --gold:#C9A24B; --gold2:#E3C877; --ink:#1E0F16; --ivory:#F8EBE1; --mute:#D9B9AE;
+  --muteink:#5A3A40;
+  --display:'Tiro Devanagari Hindi','Noto Serif Devanagari',Georgia,'Times New Roman',serif;
+  --body:'Hind','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+  --max:1180px; --pad:clamp(20px,5vw,64px); --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{font-family:var(--body);font-size:1.0625rem;line-height:1.6;color:var(--ivory);background:var(--m8);-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold2);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--gold);color:var(--ink);padding:10px 16px;z-index:100;border-radius:6px}
+.skip:focus{left:8px}
+.wrap{max-width:var(--max);margin:0 auto;padding-inline:var(--pad)}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.08;letter-spacing:-.01em}
+h2{font-size:clamp(2.2rem,5vw,3.6rem);margin-bottom:.4em}
+h3{font-size:1.5rem}
+p{max-width:62ch}
+.lead{font-size:1.2rem;color:var(--mute)}
+.on-light{background:var(--sand);color:var(--ink)}
+.on-light .lead,.on-light .muted{color:var(--muteink)}
+.muted{color:var(--mute)}
+section{padding-block:clamp(72px,10vw,128px)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:.5em;padding:.85em 1.5em;border-radius:999px;border:1.5px solid var(--gold);background:transparent;color:var(--ivory);text-decoration:none;cursor:pointer;font-weight:500;transition:background .2s var(--ease),color .2s,transform .15s var(--ease)}
+.btn:hover{background:rgba(201,162,75,.18)}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn.primary{background:var(--gold);color:var(--ink)}
+.btn.primary:hover{background:var(--gold2)}
+.on-light .btn{color:var(--ink);border-color:var(--wine)}
+.on-light .btn:hover{background:rgba(94,26,45,.1)}
+.on-light .btn.primary{background:var(--wine);color:var(--ivory)}
+.on-light .btn.primary:hover{background:var(--m8)}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(36,5,16,.88);backdrop-filter:blur(10px);border-bottom:1px solid rgba(201,162,75,.25)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:80px}
+.brand{font-family:var(--display);font-size:1.9rem;text-decoration:none;color:var(--gold2)}
+.nav ul{display:flex;gap:36px;list-style:none}
+.nav ul a{text-decoration:none;color:var(--ivory);font-size:1.15rem;font-weight:500;padding:10px 4px;background:linear-gradient(var(--gold),var(--gold)) 0 100%/0 2px no-repeat;transition:background-size .25s var(--ease)}
+.nav ul a:hover{background-size:100% 2px}
+.menu-btn{display:none;background:none;border:1.5px solid var(--gold);border-radius:999px;padding:10px 22px;font-size:1.1rem;cursor:pointer}
+@media(max-width:1180px){
+  .menu-btn{display:block}
+  .nav ul{display:none;position:absolute;left:0;right:0;top:80px;background:var(--m9);flex-direction:column;gap:0;padding:8px var(--pad) 18px;border-bottom:1px solid rgba(201,162,75,.25)}
+  .nav ul.open{display:flex}
+  .nav ul a{display:block;padding:16px 0;font-size:1.2rem}
+}
+
+/* hero */
+.hero{min-height:calc(100svh - 64px);display:flex;align-items:center;padding-block:48px;background:radial-gradient(1200px 600px at 78% 40%,rgba(201,162,75,.16),transparent 60%),var(--m8);overflow:hidden}
+.hero .wrap{display:grid;gap:48px;align-items:center;grid-template-columns:1.1fr .9fr;width:100%}
+.hero h1{font-size:clamp(5rem,15vw,11rem);line-height:1;letter-spacing:-.03em;padding:.04em .14em .14em .08em;margin:-.04em -.14em -.14em -.08em;color:var(--ivory);
+  background:linear-gradient(100deg,var(--rose) 0%,#E7866F 22%,var(--rose) 45%,var(--ivory) 55%,var(--ivory) 100%);
+  background-size:260% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:rise .9s var(--ease) both,paintPink 3.2s .6s var(--ease) forwards}
+@keyframes paintPink{0%{background-position:100% 0}100%{background-position:0% 0}}
+.hero .hi{font-family:var(--display);font-size:clamp(1.6rem,3.4vw,2.4rem);color:var(--gold2);margin:.5em 0 .7em}
+.hero p{font-size:1.2rem;color:var(--mute);margin-bottom:1.8em}
+.cta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:2.4em}
+.facts{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid rgba(201,162,75,.35);max-width:560px}
+.facts div{flex:1 1 150px;padding:14px 18px 0 0;margin-right:18px;border-right:1px solid rgba(201,162,75,.25)}
+.facts div:last-child{border:0}
+.facts b{display:block;font-family:var(--display);font-weight:400;font-size:1.5rem;color:var(--gold2);line-height:1.15}
+.facts span{font-size:.95rem;color:var(--mute)}
+.arch-wrap{justify-self:center;width:min(100%,440px)}
+.arch{position:relative;aspect-ratio:4/5.2;border-radius:50% 50% 6px 6px/36% 36% 6px 6px;padding:10px;background:linear-gradient(160deg,var(--gold2),var(--gold) 55%,#8f6b25);box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.arch::after{content:"";position:absolute;inset:22px;border-radius:50% 50% 4px 4px/36% 36% 4px 4px;border:1px solid rgba(58,11,23,.55);pointer-events:none}
+.arch .in{width:100%;height:100%;border-radius:inherit;overflow:hidden;position:relative;background:var(--wine)}
+.arch .in>svg,.arch .in>img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+[data-enter]{animation:open 1.4s var(--ease) both}
+@keyframes open{from{clip-path:inset(46% 30% 0 30% round 40% 40% 0 0);opacity:.2}to{clip-path:inset(0 0 0 0 round 0);opacity:1}}
+.hero .txt>*{animation:rise .9s var(--ease) both}
+.hero .txt>*:nth-child(2){animation-delay:.12s}.hero .txt>*:nth-child(3){animation-delay:.22s}.hero .txt>*:nth-child(4){animation-delay:.32s}.hero .txt>*:nth-child(5){animation-delay:.42s}
+.hero .txt>h1{animation:rise .9s var(--ease) both,paintPink 3.2s .6s var(--ease) forwards}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}.arch-wrap{order:-1;width:min(78%,340px)}}
+
+/* photo slots */
+.ph{position:relative;overflow:hidden;background:var(--wine);border-radius:4px}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.ph.noimg.hide{display:none}
+.ph .art{position:absolute;inset:0;background:
+  radial-gradient(circle at 50% 30%,rgba(227,200,119,.28),transparent 55%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M22 4 30 12 22 20 14 12Z M22 24 30 32 22 40 14 32Z M4 22 12 14 20 22 12 30Z M24 22 32 14 40 22 32 30Z' fill='none' stroke='%23C9A24B' stroke-opacity='.35' stroke-width='1.2'/%3E%3C/svg%3E"),
+  linear-gradient(160deg,#6a1c32,#3A0B17)}
+.on-light .ph .art{background:
+  radial-gradient(circle at 50% 30%,rgba(255,255,255,.35),transparent 55%),
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M22 4 30 12 22 20 14 12Z M22 24 30 32 22 40 14 32Z M4 22 12 14 20 22 12 30Z M24 22 32 14 40 22 32 30Z' fill='none' stroke='%235E1A2D' stroke-opacity='.3' stroke-width='1.2'/%3E%3C/svg%3E"),
+  linear-gradient(160deg,#EAB9A5,#D9917D)}
+
+/* story */
+.story .wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:center}
+.paint{position:relative;border-radius:8px;overflow:hidden;background:linear-gradient(#F7E3D3,#EBC9B0)}
+.paint .layer{display:block;width:100%;height:auto}
+.paint .pink{position:absolute;inset:0;clip-path:inset(0 calc(100% - var(--p,0%)) 0 0)}
+.paint .grey{--win:rgba(60,45,35,.5);color:#C7B7A0}
+.paint .pinkc{--win:rgba(94,26,45,.55);color:#DF8E7C}
+.paint input{position:absolute;left:5%;right:5%;bottom:14px;width:90%;accent-color:var(--wine);cursor:ew-resize}
+.paint .rail{position:absolute;top:0;bottom:0;left:var(--p,0%);width:2px;background:var(--wine);pointer-events:none;opacity:.6}
+.paint-label{display:block;margin-top:12px;font-size:.95rem;color:var(--muteink)}
+.listing{list-style:none;margin-top:28px;border-top:1px solid rgba(94,26,45,.3)}
+.listing li{display:flex;gap:18px;padding:14px 0;border-bottom:1px solid rgba(94,26,45,.2)}
+.listing b{min-width:110px;font-family:var(--display);font-weight:400;font-size:1.25rem;color:var(--wine)}
+@media(max-width:900px){.story .wrap{grid-template-columns:1fr;gap:40px}}
+
+/* places */
+.places{background:var(--m8)}
+.feature{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,5vw,64px);align-items:center;margin-top:clamp(48px,7vw,88px)}
+.feature:nth-of-type(even){grid-template-columns:.85fr 1.15fr}
+.feature:nth-of-type(even) .ph{order:2}
+.feature .ph{aspect-ratio:4/3;border-radius:200px 200px 6px 6px/120px 120px 6px 6px}
+.feature .ph:hover img{transform:scale(1.03)}
+.feature h3{font-size:clamp(2rem,4vw,3rem);color:var(--gold2);margin-bottom:.3em}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin:18px 0;padding:14px 0;border-block:1px solid rgba(201,162,75,.3);font-size:.98rem}
+.meta span b{color:var(--gold2);font-weight:500}
+.link{color:var(--gold2);text-underline-offset:4px}
+.link:hover{color:var(--ivory)}
+.compact{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-top:clamp(56px,8vw,96px)}
+.card{background:var(--wine);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s var(--ease),box-shadow .25s}
+.card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.3)}
+.card .ph{aspect-ratio:16/10;border-radius:0}
+.card:hover .ph img{transform:scale(1.03)}
+.card .b{padding:18px 20px 22px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{font-size:1.45rem;color:var(--gold2)}
+.card p{font-size:.98rem;color:var(--mute)}
+.card .mini{margin-top:auto;font-size:.9rem;color:var(--mute)}
+.mapbox{margin-top:clamp(56px,8vw,96px);display:grid;grid-template-columns:.8fr 1.2fr;gap:40px;align-items:center}
+.mapwrap{position:relative}
+#realmap{height:520px;border-radius:10px;border:1px solid rgba(201,162,75,.3);background:var(--m9);overflow:hidden}
+#realmap .leaflet-tile-pane{filter:sepia(.2) saturate(.9)}
+.mapbtn{position:absolute;right:12px;top:12px;white-space:nowrap;z-index:500;min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--gold);background:var(--m9);color:var(--gold2);cursor:pointer;font-weight:600}
+.mapbtn:hover{background:var(--wine)}
+.pin{width:30px;height:30px;border-radius:50%;background:var(--gold);color:var(--ink);border:3px solid var(--m9);display:grid;place-items:center;font:700 .85rem var(--body);box-shadow:0 2px 8px rgba(0,0,0,.45);transition:transform .2s}
+.pin.on{transform:scale(1.25);background:var(--gold2)}
+.maplist{list-style:none;margin-top:1.2em;columns:2;column-gap:20px;font-size:.98rem}
+.maplist li{break-inside:avoid;margin-bottom:6px}
+.maplist button{background:none;border:0;color:var(--ivory);cursor:pointer;text-align:left;padding:4px 0;display:flex;gap:10px;align-items:center}
+.maplist button:hover{color:var(--gold2)}
+.maplist b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--gold);color:var(--ink);font-size:.78rem}
+.leaflet-popup-content-wrapper{background:var(--m8);color:var(--ivory);border:1px solid var(--gold)}
+.leaflet-popup-tip{background:var(--m8)}
+.leaflet-popup-content a{color:var(--gold2)}
+@media(max-width:900px){.feature,.feature:nth-of-type(even){grid-template-columns:1fr}.feature:nth-of-type(even) .ph{order:0}.mapbox{grid-template-columns:1fr}}
+
+/* gallery */
+.gal{background:var(--m9)}
+.masonry{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.gi{margin:0;overflow:hidden;border-radius:6px;background:var(--wine);aspect-ratio:4/5}
+.gi img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
+.gi:hover img{transform:scale(1.03)}
+@media(max-width:900px){.masonry{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.masonry{grid-template-columns:1fr}.gi{aspect-ratio:4/5}}
+
+/* travel */
+.travel{background:var(--m8)}
+.tbox{margin-top:36px;background:var(--m9);border:1px solid rgba(201,162,75,.35);border-radius:12px;padding:28px;max-width:860px}
+.tbox .row{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px}
+.tbox label{display:block;font-size:.9rem;color:var(--mute);margin-bottom:6px}
+.tbox select,.tbox input{width:100%;min-height:50px;padding:10px 12px;border-radius:8px;border:1px solid rgba(201,162,75,.45);background:var(--m8);color:var(--ivory)}
+.tbox .to{margin-top:16px;padding:12px 14px;border-radius:8px;background:rgba(201,162,75,.12);color:var(--gold2)}
+.tbtns{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.tbtns a{display:inline-flex;align-items:center;min-height:50px;padding:0 24px;border-radius:999px;text-decoration:none;font-weight:600;background:var(--gold);color:var(--ink);transition:transform .2s}
+.tbtns a.alt{background:none;color:var(--gold2);border:1px solid var(--gold)}
+.tbtns a:hover{transform:translateY(-2px)}
+.tnote{margin-top:16px;font-size:.88rem;color:var(--mute);max-width:70ch}
+@media(max-width:700px){.tbox .row{grid-template-columns:1fr}.tbox{padding:20px}}
+
+/* planner */
+.planner h2{color:var(--m8)}
+.panel{background:#fff7f1;border:1px solid rgba(94,26,45,.2);border-radius:10px;padding:clamp(20px,3vw,32px);margin-top:28px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0 22px}
+.row legend,.lbl{font-weight:600;margin-right:6px;display:block;width:100%;margin-bottom:4px}
+fieldset{border:0}
+.chip{border:1.5px solid var(--wine);background:transparent;color:var(--ink);border-radius:999px;padding:.5em 1.1em;cursor:pointer;transition:background .15s,color .15s,transform .15s}
+.chip:hover{background:rgba(94,26,45,.1)}
+.chip[aria-pressed="true"]{background:var(--wine);color:var(--ivory)}
+.chip:active{transform:scale(.97)}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:8px}
+.day{background:#fff;border:1px solid rgba(94,26,45,.18);border-radius:10px;padding:20px;transition:transform .2s var(--ease),box-shadow .2s}
+.day:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(94,26,45,.14)}
+.day h4{font-family:var(--display);font-weight:400;font-size:1.5rem;color:var(--wine);margin-bottom:2px}
+.day .sub{font-size:.95rem;color:var(--muteink);margin-bottom:12px}
+.day ol{list-style:none;border-left:2px solid rgba(201,162,75,.7);margin-left:4px}
+.day li{padding:0 0 14px 16px;position:relative}
+.day li::before{content:"";position:absolute;left:-6px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--gold)}
+.day li b{display:block;font-weight:600}
+.day li em{font-style:normal;font-size:.88rem;color:var(--muteink)}
+.day .eat{margin-top:6px;padding:10px 12px;background:rgba(201,162,75,.18);border-radius:6px;font-size:.95rem}
+.tools{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:10px}
+.calc label{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;white-space:nowrap;font-size:.95rem;font-weight:500}
+.calc input{padding:.6em .8em;border:1.5px solid rgba(94,26,45,.4);border-radius:8px;background:#fff;color:var(--ink)}
+.total{margin-top:20px;display:flex;flex-wrap:wrap;gap:12px 40px;align-items:baseline;padding-top:16px;border-top:1px solid rgba(94,26,45,.25)}
+.total b{font-family:var(--display);font-weight:400;font-size:2.4rem;color:var(--wine)}
+.note{font-size:.92rem;color:var(--muteink);margin-top:10px;max-width:70ch}
+
+/* food */
+.food{background:var(--wine)}
+.food h2{color:var(--gold2)}
+.dishes{display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;margin:36px 0 12px;border-top:1px solid rgba(201,162,75,.4)}
+.dishes div{padding:16px 18px 16px 0;border-bottom:1px solid rgba(201,162,75,.25)}
+.dishes b{display:block;font-family:var(--display);font-weight:400;font-size:1.3rem;color:var(--gold2)}
+.dishes span{font-size:.95rem;color:var(--mute)}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin:36px 0 26px}
+.food .chip{border-color:var(--gold);color:var(--ivory)}
+.food .chip:hover{background:rgba(201,162,75,.18)}
+.food .chip[aria-pressed="true"]{background:var(--gold);color:var(--ink)}
+.joints{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+.joint{background:var(--m8);border:1px solid rgba(201,162,75,.28);border-radius:10px;padding:0;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s var(--ease),border-color .2s}
+.joint:hover{transform:translateY(-2px);border-color:var(--gold)}
+.joint .ph{aspect-ratio:16/10;border-radius:0}
+.joint:hover .ph img{transform:scale(1.03)}
+.joint .b{padding:20px 22px 22px;display:flex;flex-direction:column;gap:8px;flex:1}
+.joint .links{margin-top:auto;padding-top:6px;display:flex;gap:18px;flex-wrap:wrap}
+.joint h3{font-size:1.5rem;color:var(--gold2)}
+.joint .area{font-size:.92rem;color:var(--mute)}
+.joint .try{font-size:1rem}
+.joint .try b{color:var(--gold2);font-weight:500}
+.joint .tip{font-size:.95rem;color:var(--mute)}
+
+.trail{margin-top:56px;display:grid;grid-template-columns:.9fr 1.1fr;gap:40px;align-items:start}
+.trail ol{list-style:none;border-left:2px solid var(--gold);margin-left:6px}
+.trail li{padding:0 0 18px 20px;position:relative}
+.trail li::before{content:"";position:absolute;left:-7px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--gold2)}
+.trail li b{font-family:var(--display);font-weight:400;font-size:1.25rem;color:var(--gold2);display:block}
+@media(max-width:900px){.trail{grid-template-columns:1fr}.dishes{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.dishes{grid-template-columns:1fr}}
+
+/* essentials */
+.ess h2{color:var(--m8)}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;margin-top:40px}
+.tile{background:#fff7f1;border:1px solid rgba(94,26,45,.2);border-radius:10px;padding:22px 22px 24px}
+.tile h3{color:var(--wine);margin-bottom:8px}
+.tile ul{list-style:none}
+.tile li{padding:8px 0;border-bottom:1px solid rgba(94,26,45,.14);font-size:1rem}
+.tile li:last-child{border:0}
+.tile li b{font-weight:600}
+.phrases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+.phrase{text-align:left;background:#fff;border:1.5px solid rgba(94,26,45,.3);border-radius:10px;padding:14px 16px;cursor:pointer;transition:border-color .15s,transform .15s var(--ease)}
+.phrase:hover{border-color:var(--wine);transform:translateY(-2px)}
+.phrase .dv{display:block;font-family:var(--display);font-size:1.45rem;color:var(--wine)}
+.phrase .en{display:block;font-size:.92rem;color:var(--muteink)}
+.phrase small{color:var(--muteink)}
+.seasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;margin-top:24px;border-top:2px solid var(--wine)}
+.seasons div{padding:18px 22px 18px 0;border-bottom:1px solid rgba(94,26,45,.2)}
+.seasons b{font-family:var(--display);font-weight:400;font-size:1.4rem;color:var(--wine);display:block}
+
+footer{background:var(--m9);padding-block:56px 40px;color:var(--mute)}
+footer .big{font-family:var(--display);font-size:clamp(2rem,6vw,4rem);color:var(--gold2);margin-bottom:12px}
+footer p{font-size:.95rem}
+footer .credits{margin-top:28px;padding-top:18px;border-top:1px solid rgba(201,162,75,.25);font-size:.85rem;max-width:90ch}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:var(--ivory);padding:12px 20px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s var(--ease);z-index:90;border:1px solid var(--gold)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){
+  .hero h1{animation:none;background-position:0 0}
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="skyline" viewBox="0 0 800 260">
+      <rect y="228" width="800" height="32" fill="currentColor"/>
+      <rect x="0" y="176" width="800" height="54" fill="currentColor"/>
+      <path fill="currentColor" d="M3 162h16v14H3zM29 162h16v14H29zM55 162h16v14H55zM81 162h16v14H81zM107 162h16v14H107zM133 162h16v14H133zM159 162h16v14H159zM185 162h16v14H185zM211 162h16v14H211zM237 162h16v14H237zM263 162h16v14H263zM289 162h16v14H289zM315 162h16v14H315zM341 162h16v14H341zM367 162h16v14H367zM393 162h16v14H393zM419 162h16v14H419zM445 162h16v14H445zM471 162h16v14H471zM497 162h16v14H497zM523 162h16v14H523zM549 162h16v14H549zM575 162h16v14H575zM601 162h16v14H601zM627 162h16v14H627zM653 162h16v14H653zM679 162h16v14H679zM705 162h16v14H705zM731 162h16v14H731zM757 162h16v14H757zM783 162h16v14H783z"/>
+      <g fill="currentColor">
+        <rect x="318" y="96" width="164" height="134"/>
+        <rect x="330" y="62" width="30" height="40"/><path d="M326 62a19 22 0 0 1 38 0Z"/><rect x="343" y="34" width="4" height="14"/>
+        <rect x="440" y="62" width="30" height="40"/><path d="M436 62a19 22 0 0 1 38 0Z"/><rect x="453" y="34" width="4" height="14"/>
+        <rect x="96" y="118" width="86" height="56"/><path d="M92 118a47 34 0 0 1 94 0Z"/><rect x="136" y="70" width="5" height="16"/>
+        <rect x="598" y="196" width="130" height="34"/><rect x="608" y="160" width="110" height="38"/><rect x="620" y="124" width="86" height="38"/><rect x="632" y="90" width="62" height="36"/><rect x="644" y="62" width="38" height="30"/><path d="M640 62a23 22 0 0 1 46 0Z"/>
+      </g>
+      <path fill="var(--win,rgba(94,26,45,.55))" d="M339 126V115a6 6 0 0 1 12 0v11ZM361 126V115a6 6 0 0 1 12 0v11ZM383 126V115a6 6 0 0 1 12 0v11ZM405 126V115a6 6 0 0 1 12 0v11ZM427 126V115a6 6 0 0 1 12 0v11ZM449 126V115a6 6 0 0 1 12 0v11ZM339 150V139a6 6 0 0 1 12 0v11ZM361 150V139a6 6 0 0 1 12 0v11ZM383 150V139a6 6 0 0 1 12 0v11ZM405 150V139a6 6 0 0 1 12 0v11ZM427 150V139a6 6 0 0 1 12 0v11ZM449 150V139a6 6 0 0 1 12 0v11ZM339 174V163a6 6 0 0 1 12 0v11ZM361 174V163a6 6 0 0 1 12 0v11ZM383 174V163a6 6 0 0 1 12 0v11ZM405 174V163a6 6 0 0 1 12 0v11ZM427 174V163a6 6 0 0 1 12 0v11ZM449 174V163a6 6 0 0 1 12 0v11ZM613 220V209a6 6 0 0 1 12 0v11ZM635 220V209a6 6 0 0 1 12 0v11ZM657 220V209a6 6 0 0 1 12 0v11ZM679 220V209a6 6 0 0 1 12 0v11ZM701 220V209a6 6 0 0 1 12 0v11ZM613 184V173a6 6 0 0 1 12 0v11ZM635 184V173a6 6 0 0 1 12 0v11ZM657 184V173a6 6 0 0 1 12 0v11ZM679 184V173a6 6 0 0 1 12 0v11ZM701 184V173a6 6 0 0 1 12 0v11ZM635 148V137a6 6 0 0 1 12 0v11ZM657 148V137a6 6 0 0 1 12 0v11ZM679 148V137a6 6 0 0 1 12 0v11ZM646 114V103a6 6 0 0 1 12 0v11ZM668 114V103a6 6 0 0 1 12 0v11ZM111 150V139a6 6 0 0 1 12 0v11ZM133 150V139a6 6 0 0 1 12 0v11ZM155 150V139a6 6 0 0 1 12 0v11Z"/>
+      <path fill="var(--win,rgba(94,26,45,.55))" d="M352 228V176a12 12 0 0 1 24 0v52ZM388 228V150a12 12 0 0 1 24 0v78ZM424 228V176a12 12 0 0 1 24 0v52Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Jaipur home">Jaipur</a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu">Menu</button>
+    <ul id="menu">
+      <li><a href="#story">The Pink City</a></li>
+      <li><a href="#places">Places</a></li>
+      <li><a href="#travel">Get there</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#plan">Plan your trip</a></li>
+      <li><a href="#food">Where to eat</a></li>
+      <li><a href="#essentials">Essentials</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="main">
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="txt">
+      <h1>Jaipur</h1>
+      <p class="hi" lang="hi">पधारो म्हारे देस</p>
+      <p>Forts on the hills, bazaars in the walled city and some of the best street food in India. This guide helps you see Jaipur properly in one to five days.</p>
+      <div class="cta">
+        <a class="btn primary" href="#plan">Plan my trip</a>
+        <a class="btn" href="#food">See where to eat</a>
+      </div>
+      <div class="facts">
+        <div><b>1727</b><span>Founded by Sawai Jai Singh II</span></div>
+        <div><b>1876</b><span>Painted pink to welcome a prince</span></div>
+        <div><b>Three</b><span>UNESCO World Heritage listings</span></div>
+      </div>
+    </div>
+    <div class="arch-wrap">
+      <div class="arch" data-enter>
+        <div class="in">
+          <svg viewBox="0 0 400 520" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustration of the Hawa Mahal facade at sunrise">
+            <defs>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5E1A2D"/><stop offset=".5" stop-color="#B4475A"/><stop offset=".8" stop-color="#E9A27C"/><stop offset="1" stop-color="#F2C894"/></linearGradient>
+              <pattern id="hw" width="20" height="22" patternUnits="userSpaceOnUse"><path d="M4 20V10a6 6 0 0 1 12 0v10Z" fill="rgba(58,11,23,.62)"/></pattern>
+            </defs>
+            <rect width="400" height="520" fill="url(#sky)"/>
+            <circle cx="200" cy="330" r="96" fill="#E3C877" opacity=".92"/>
+            <g fill="#E49A86">
+              <rect x="40" y="410" width="320" height="86"/><rect x="62" y="350" width="276" height="62"/><rect x="88" y="292" width="224" height="60"/><rect x="116" y="238" width="168" height="56"/><rect x="144" y="190" width="112" height="50"/>
+              <path d="M160 190a40 44 0 0 1 80 0Z"/><rect x="198" y="132" width="4" height="18"/>
+            </g>
+            <g fill="url(#hw)">
+              <rect x="40" y="414" width="320" height="82"/><rect x="62" y="354" width="276" height="58"/><rect x="88" y="296" width="224" height="56"/><rect x="116" y="242" width="168" height="52"/><rect x="144" y="194" width="112" height="46"/>
+            </g>
+            <rect y="494" width="400" height="26" fill="#240510"/>
+          </svg>
+          <div class="ph" data-slot="hero" data-alt="Hawa Mahal in Jaipur at sunrise" style="position:absolute;inset:0;border-radius:0;background:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="on-light story" id="story">
+  <div class="wrap">
+    <div>
+      <h2>Why the city is pink</h2>
+      <p class="lead" style="margin-bottom:1em">Maharaja Sawai Jai Singh II founded Jaipur in 1727 and planned it on a grid, which was unusual for its time. In 1876 the walled city was painted pink to welcome the Prince of Wales, and the colour stayed.</p>
+      <p>Today the old city still follows its original plan, with wide bazaars, gates in every direction and the hill forts looking down on it. Drag the slider to repaint it.</p>
+      <ul class="listing">
+        <li><b>2010</b><span>Jantar Mantar, the stone observatory, is listed by UNESCO.</span></li>
+        <li><b>2013</b><span>Amer Fort is listed with the other hill forts of Rajasthan.</span></li>
+        <li><b>2019</b><span>The walled city of Jaipur is listed.</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="paint" id="paint" style="--p:0%">
+        <svg class="layer grey" viewBox="0 0 800 260" aria-hidden="true"><use href="#skyline"/></svg>
+        <svg class="layer pink pinkc" viewBox="0 0 800 260" aria-hidden="true"><use href="#skyline"/></svg>
+        <div class="rail" aria-hidden="true"></div>
+        <input type="range" min="0" max="100" value="0" id="paintRange" aria-label="Repaint the city pink">
+      </div>
+      <span class="paint-label">Before and after 1876. Move the slider to repaint.</span>
+    </div>
+  </div>
+</section>
+
+<!-- PLACES -->
+<section class="places" id="places">
+  <div class="wrap">
+    <h2>Places worth your time</h2>
+    <p class="lead">Start with these four, then fill in the rest. Each link opens the place in Google Maps.</p>
+    <div id="features"></div>
+    <div class="compact" id="compact"></div>
+
+    <div class="mapbox">
+      <div>
+        <h3 style="color:var(--gold2);font-size:2rem;margin-bottom:.4em">How it fits together</h3>
+        <p class="muted">Amer and Jaigarh sit north of the city, the walled city is the centre, and Albert Hall and Ram Niwas Garden are just south of its gates. Group places by area and you will lose far less time in traffic.</p>
+        <ol class="maplist" id="maplist"></ol>
+        <p class="muted" style="margin-top:.8em;font-size:.9rem">Pins are approximate. Tap a pin, then open it in Google Maps for the exact spot.</p>
+      </div>
+      <div class="mapwrap"><div id="realmap" role="region" aria-label="Map of Jaipur sights"></div><button type="button" class="mapbtn" id="mapAll">Show all</button><button type="button" class="mapbtn" id="mapCity" style="right:130px">Walled city</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRAVEL -->
+<section class="travel" id="travel">
+  <div class="wrap">
+    <h2 style="color:var(--gold2)">Get to Jaipur</h2>
+    <p class="lead" style="color:var(--mute)">Pick where you start and the day. Jaipur is already filled in as the destination.</p>
+    <form class="tbox" id="tform" onsubmit="return false">
+      <div class="row">
+        <div><label for="tFrom">From</label><select id="tFrom"></select></div>
+        <div><label for="tDate">Travel date</label><input type="date" id="tDate"></div>
+        <div><label for="tPax">Travellers</label><select id="tPax"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+      </div>
+      <p class="to" id="tTo">To: Jaipur (airport JAI, Jaipur Junction JP)</p>
+      <div class="tbtns">
+        <a id="bFlight" target="_blank" rel="noopener">Search flights</a>
+        <a id="bTrain" class="alt" target="_blank" rel="noopener">Search trains</a>
+        <a id="bBus" class="alt" target="_blank" rel="noopener">Search buses</a>
+      </div>
+      <p class="tnote">Booking happens on the partner site (Google Flights, IRCTC, RedBus), which opens in a new tab. Flights open with your route and date filled in. For trains, your route is shown below to enter on IRCTC.</p>
+      <p class="tnote" id="tTrain"></p>
+    </form>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gal" id="gallery">
+  <div class="wrap">
+    <h2 style="color:var(--gold2)">Jaipur in detail</h2>
+    <p class="lead" style="color:var(--mute)">Doorways, lattice windows and painted arches. You will keep looking up.</p>
+    <div class="masonry">
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g1.jpg" alt="Carved gateway with a brass door in Jaipur" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g2.jpg" alt="Close view of the windows of Hawa Mahal glowing in warm light" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g3.jpg" alt="Painted arches of Patrika Gate" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g4.jpg" alt="A pink sandstone gate of the walled city" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g5.jpg" alt="Hawa Mahal facade in soft pink light" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g6.jpg" alt="Pink balconies and domes above the old city" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g7.jpg" alt="Hawa Mahal with an auto-rickshaw on the street below" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g8.jpg" alt="Pink palace walls with a domed chhatri" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g9.jpg" alt="The painted corridor of Patrika Gate" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g10.jpg" alt="Decorated horses passing Hawa Mahal" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g11.jpg" alt="Hawa Mahal facade in afternoon light" onerror="this.parentNode.remove()"></figure>
+      <figure class="gi"><img loading="lazy" decoding="async" src="photos/g12.jpg" alt="A domed pavilion above the rooftops of Jaipur" onerror="this.parentNode.remove()"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- PLANNER -->
+<section class="on-light planner" id="plan">
+  <div class="wrap">
+    <h2>Plan your trip</h2>
+    <p class="lead">Choose how many days you have and what you enjoy. You get a day-by-day plan grouped by area, with a food stop on each day.</p>
+    <div class="panel">
+      <fieldset class="row" id="dayPick"><legend>How many days?</legend></fieldset>
+      <fieldset class="row" id="interestPick"><legend>What do you enjoy? Pick any.</legend></fieldset>
+      <div class="days" id="itinerary" aria-live="polite"></div>
+      <div class="tools">
+        <button class="btn primary" id="copyPlan">Copy plan</button>
+        <a class="btn" id="waShare" target="_blank" rel="noopener" href="#">Share on WhatsApp</a>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 style="color:var(--wine);margin-bottom:6px">What will it cost?</h3>
+      <p class="note" style="margin-top:0">These starting values are rough guesses, not quotes. Change them to match what you find when you book.</p>
+      <div class="calc">
+        <label>Days<input type="number" id="cDays" min="1" max="14" value="3"></label>
+        <label>Travellers<input type="number" id="cPeople" min="1" max="12" value="2"></label>
+        <label>Rooms<input type="number" id="cRooms" min="1" max="6" value="1"></label>
+        <label>Room per night (₹)<input type="number" id="cStay" min="0" step="100" value="2500"></label>
+        <label>Food per person/day (₹)<input type="number" id="cFood" min="0" step="50" value="800"></label>
+        <label>Transport per day (₹)<input type="number" id="cTrans" min="0" step="100" value="900"></label>
+        <label>Tickets per person/day (₹)<input type="number" id="cTix" min="0" step="50" value="500"></label>
+      </div>
+      <div class="total" aria-live="polite">
+        <div><span class="muted">Trip total</span><br><b id="tTotal">0</b></div>
+        <div><span class="muted">Per person</span><br><b id="tPP">0</b></div>
+      </div>
+      <p class="note">Entry fees, hotel rates and cab prices change with season and nationality. Check official ticket counters and your booking site.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOD -->
+<section class="food" id="food">
+  <div class="wrap">
+    <h2>Where Jaipur eats</h2>
+    <p class="lead" style="color:var(--mute)">Old sweet shops, kachori counters and chai stalls that locals queue at. Most are inside or near the walled city and are easy to string together on foot or by auto.</p>
+
+    <div class="dishes">
+      <div><b>Pyaaz kachori</b><span>Fried pastry stuffed with spiced onion. The city's signature snack.</span></div>
+      <div><b>Ghewar</b><span>A honeycomb-shaped sweet soaked in syrup, often topped with rabri.</span></div>
+      <div><b>Dal baati churma</b><span>Baked wheat balls with lentils and a sweet crumbled churma.</span></div>
+      <div><b>Mirchi vada</b><span>A large chilli in a gram-flour batter, fried and served hot.</span></div>
+      <div><b>Lassi in a kulhad</b><span>Thick, sweet, with malai on top, served in a clay cup.</span></div>
+      <div><b>Laal maas</b><span>A fiery red mutton curry. Vegetarians can skip it, there is plenty else.</span></div>
+    </div>
+
+    <div class="filters" id="foodFilters" role="group" aria-label="Filter food places"></div>
+    <div class="joints" id="joints"></div>
+
+    <div class="trail">
+      <div>
+        <h3 style="color:var(--gold2);font-size:2rem;margin-bottom:.4em">A one-day food trail</h3>
+        <p class="muted">A sample order that moves from breakfast to late evening without much backtracking. Swap stops freely.</p>
+      </div>
+      <ol>
+        <li><b>Morning</b>Kachori and a sweet at Rawat Mishthan Bhandar, then a lassi on MI Road.</li>
+        <li><b>Midday</b>A Rajasthani thali or dal kachori at LMB in Johari Bazaar.</li>
+        <li><b>Late afternoon</b>Masala chai and a bun samosa at Gulab Ji Chai.</li>
+        <li><b>Evening</b>Kesar kulfi near Hawa Mahal, then walk the bazaar.</li>
+        <li><b>Night</b>Street food in Ram Niwas Bagh at Masala Chowk. Check its hours first.</li>
+      </ol>
+    </div>
+    <p class="note" style="color:var(--mute);margin-top:34px">Compiled from public food guides, including Outlook Traveller, LBB, Time Out and Holidify. Menus, prices and opening hours change, so confirm locally. Many places are cash only.</p>
+  </div>
+</section>
+
+<!-- ESSENTIALS -->
+<section class="on-light ess" id="essentials">
+  <div class="wrap">
+    <h2>Before you go</h2>
+    <div class="seasons">
+      <div><b>October to March</b><span>The best time to visit. Days are pleasant, evenings are cool, and it is the easiest season for outdoor sightseeing and street food.</span></div>
+      <div><b>April to June</b><span>Very hot. Plan forts for early morning and rest in the afternoon.</span></div>
+      <div><b>July to September</b><span>Monsoon. The hills turn green and crowds thin, but expect humidity and rain.</span></div>
+    </div>
+
+    <div class="grid3">
+      <div class="tile"><h3>Getting there</h3><ul>
+        <li><b>By air</b> Jaipur International Airport, in Sanganer, south of the city.</li>
+        <li><b>By train</b> Jaipur Junction is the main station, well connected to Delhi, Mumbai and Ahmedabad.</li>
+        <li><b>By road</b> Roughly 5 to 6 hours from Delhi.</li>
+      </ul></div>
+      <div class="tile"><h3>Getting around</h3><ul>
+        <li><b>App cabs</b> The easiest way to avoid haggling.</li>
+        <li><b>Autos and e-rickshaws</b> Agree the fare before you get in, or insist on the meter.</li>
+        <li><b>Full-day cab</b> Worth it for Amer, Jaigarh and Nahargarh together.</li>
+      </ul></div>
+      <div class="tile"><h3>Stay smart</h3><ul>
+        <li>Buy tickets at the official counters or official sites, and ask about combined tickets.</li>
+        <li>If someone says a fort is closed today, check at the gate yourself.</li>
+        <li>Compare two shops before buying gems or carpets. Guides often take commissions.</li>
+        <li>Cover shoulders and knees at temples, and remove footwear where asked.</li>
+      </ul></div>
+      <div class="tile"><h3>What to buy</h3><ul>
+        <li><b>Block-printed fabric</b> Sanganer and Bapu Bazaar.</li>
+        <li><b>Jewellery and gems</b> Johari Bazaar. Buy from established shops.</li>
+        <li><b>Mojari shoes</b> Bapu Bazaar and Nehru Bazaar.</li>
+        <li><b>Blue pottery</b> Jaipur's glazed ceramics, best bought from a studio.</li>
+      </ul></div>
+    </div>
+
+    <h3 style="color:var(--wine);margin-top:56px;font-size:2rem">A few words that help</h3>
+    <p class="note" style="margin-top:6px">Tap a phrase to copy it.</p>
+    <div class="phrases" id="phrases"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="big" lang="hi">पधारो म्हारे देस</div>
+    <p>Welcome to my land. Prices, timings and ticket rules change, so check locally before you go.</p>
+    <p class="credits">Photographs from Unsplash: Abhishek R, Aditya Gunturu, Aditya Siva, Annie Spratt, Anshul Gurjar, Dewang Gupta, Dexter Fernandes, Giuliano Gabella, Abhinav, Harsh Jain, Meric Dagli, Mukul Saini, Satyam Bhardwaj, Vikas Pokar. From Pexels: Altaf Mughal, Ansh Yati, AXP Photography, Apratim Debnath, Urtimud 89.</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script>
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const toast=(m)=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),1800)};
+const copy=async(txt)=>{try{await navigator.clipboard.writeText(txt)}catch(e){const a=document.createElement('textarea');a.value=txt;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}toast('Copied')};
+const dirs=q=>'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(q);
+const maps=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+
+/* ---------- photo slots: put photos in /photos named by slot (jpg, jpeg, png or webp) ---------- */
+function mountPhoto(el){
+  const slot=el.dataset.slot, alt=el.dataset.alt||'';
+  if(!el.querySelector('.art') && !el.closest('.arch')){const a=document.createElement('div');a.className='art';a.setAttribute('aria-hidden','true');el.prepend(a)}
+  const exts=['jpg','jpeg','png','webp'];let i=0;
+  const img=new Image();img.alt=alt;img.decoding='async';
+  if(el.dataset.pos)img.style.objectPosition=el.dataset.pos;
+  img.onload=()=>{el.classList.remove('noimg');el.appendChild(img)};
+  img.onerror=()=>{i++;if(i<exts.length)img.src='photos/'+slot+'.'+exts[i];else el.classList.add('noimg')};
+  img.src='photos/'+slot+'.'+exts[0];
+}
+
+/* ---------- places ---------- */
+const PLACES=[
+ {id:'amer-fort',pos:'50% 30%',name:'Amer Fort',time:'3 to 4 hours',best:'Architecture, views',tip:'Arrive near opening time, before the tour buses. Walk up or take a jeep.',q:'Amer Fort Jaipur',big:true,
+  text:'Begun in 1592 by Raja Man Singh I, the fort climbs a hill of the Aravalli range north of the city. Inside, the mirror work of Sheesh Mahal is the part people remember.'},
+ {id:'hawa-mahal',name:'Hawa Mahal',time:'45 minutes',best:'Photography',tip:'The facade faces east, so go early for the light, or watch from a cafe across the road.',q:'Hawa Mahal Jaipur',big:true,
+  text:'Built in 1799 so the royal women could watch street life without being seen. Its 953 small windows are why the facade is so recognisable.'},
+ {id:'city-palace',name:'City Palace',time:'2 hours',best:'Culture, courtyards',tip:'Part of the palace is still the royal family\'s home. Allow time for the museum rooms.',q:'City Palace Jaipur',big:true,
+  text:'A complex of courtyards, gates and museums at the heart of the old city. The doorways and painted gates are as good as the collections.'},
+ {id:'jantar-mantar',name:'Jantar Mantar',time:'1 hour',best:'Curious minds',tip:'Go with a guide or an audio guide. The instruments make more sense when explained.',q:'Jantar Mantar Jaipur',big:true,
+  text:'An observatory of giant stone instruments built by Sawai Jai Singh II. The Samrat Yantra is a huge sundial that still tells the time.'},
+ {id:'nahargarh',name:'Nahargarh Fort',time:'1.5 hours',best:'Sunset views',tip:'Reach it by late afternoon so you are on the ramparts when the light turns gold.',q:'Nahargarh Fort Jaipur',
+  text:'A hilltop fort above the walled city. Come for the view over the pink rooftops at sunset.'},
+ {id:'jaigarh',name:'Jaigarh Fort',time:'1.5 hours',best:'Military history',tip:'Pair it with Amer, which sits just below it.',q:'Jaigarh Fort Jaipur',
+  text:'The fort above Amer, home to the Jaivana, one of the largest cannons on wheels.'},
+ {id:'jal-mahal',name:'Jal Mahal',time:'30 minutes',best:'A quick photo stop',tip:'It is usually viewed from the lakeside promenade. Stop here on the way to or from Amer.',q:'Jal Mahal Jaipur',
+  text:'A palace that seems to float in the middle of Man Sagar Lake, framed by the hills behind it.'},
+ {id:'patrika-gate',name:'Patrika Gate',time:'30 minutes',best:'Photography',tip:'Go around golden hour. It sits at Jawahar Circle, so pair it with a walk in the garden.',q:'Patrika Gate Jaipur',
+  text:'A modern gate at Jawahar Circle whose arches and corridors are painted in the style of Rajasthani havelis. People come mainly for the photographs.'},
+ {id:'albert-hall',name:'Albert Hall Museum',time:'1.5 hours',best:'Evenings, crafts',tip:'The building is lit up after dark, so even a short evening walk past it is worth it.',q:'Albert Hall Museum Jaipur',
+  text:'An Indo-Saracenic building from the 1880s with a museum of textiles, miniatures and crafts.'},
+ {id:'bazaar',name:'Johari and Bapu Bazaar',time:'2 hours',best:'Shopping, snacks',tip:'Compare two shops before buying, and bargain politely.',q:'Johari Bazaar Jaipur',
+  text:'Jewellery and gemstones in Johari Bazaar, block-printed textiles and mojari shoes in Bapu Bazaar.'}
+];
+function renderPlaces(){
+  const f=$('#features'),c=$('#compact');
+  f.innerHTML=PLACES.filter(p=>p.big).map(p=>`
+   <article class="feature">
+     <div class="ph" data-slot="${p.id}" data-pos="${p.pos||''}" data-alt="${p.name}, Jaipur"></div>
+     <div>
+       <h3>${p.name}</h3>
+       <p>${p.text}</p>
+       <div class="meta"><span><b>Time</b> ${p.time}</span><span><b>Best for</b> ${p.best}</span></div>
+       <p class="muted" style="font-size:.98rem"><b style="color:var(--gold2);font-weight:500">Tip</b> ${p.tip}</p>
+       <p style="margin-top:14px"><a class="link" href="${maps(p.q)}" target="_blank" rel="noopener">Open in Maps</a></p>
+     </div>
+   </article>`).join('');
+  c.innerHTML=PLACES.filter(p=>!p.big).map(p=>`
+   <article class="card">
+     <div class="ph" data-slot="${p.id}" data-pos="${p.pos||''}" data-alt="${p.name}, Jaipur"></div>
+     <div class="b">
+       <h3>${p.name}</h3>
+       <p>${p.text}</p>
+       <p class="mini">${p.time}. ${p.tip}</p>
+       <a class="link" href="${maps(p.q)}" target="_blank" rel="noopener">Open in Maps</a>
+     </div>
+   </article>`).join('');
+}
+
+/* ---------- planner ---------- */
+const INTERESTS=[['forts','Forts and views'],['culture','History and culture'],['markets','Markets and crafts'],['food','Food'],['photography','Photography']];
+const BLOCKS=[
+ {id:'north',title:'Amer and the lake road',sub:'North of the city. Start early.',w:{forts:3,photography:2,culture:2,food:0,markets:0},
+  stops:[['Morning','Amer Fort','Reach it near opening time. Allow 3 to 4 hours.'],['Midday','Panna Meena ka Kund','A short stop at the geometric stepwell near Amer.'],['Afternoon','Jal Mahal viewpoint','Photo stop on the way back, from the lakeside.']],
+  eat:'Start with pyaaz kachori at Rawat Mishthan Bhandar before you head north.'},
+ {id:'city',title:'The walled city',sub:'Compact and walkable. Do it on foot or by auto.',w:{culture:3,markets:2,photography:2,food:2,forts:1},
+  stops:[['Early morning','Hawa Mahal','The east-facing facade catches the first light.'],['Morning','City Palace','Allow about 2 hours for the courtyards and museum.'],['Midday','Jantar Mantar','About an hour. A guide helps.'],['Late afternoon','Johari and Bapu Bazaar','Jewellery, textiles and mojaris. Bargain politely.']],
+  eat:'Thali at LMB in Johari Bazaar, then kesar kulfi near Hawa Mahal.'},
+ {id:'hills',title:'Hill forts at sunset',sub:'Best on a clear afternoon.',w:{forts:3,photography:3,culture:1,food:0,markets:0},
+  stops:[['Afternoon','Jaigarh Fort','See the Jaivana cannon and the long walls.'],['Late afternoon','Nahargarh Fort','Be on the ramparts for sunset over the pink city.']],
+  eat:'Stop for masala chai at Gulab Ji before you drive up.'},
+ {id:'culture',title:'Museums and an evening out',sub:'A slower day with a good dinner.',w:{culture:3,food:2,photography:1,markets:1,forts:0},
+  stops:[['Afternoon','Albert Hall Museum','Textiles, miniatures and an Indo-Saracenic building.'],['Evening','Walk past Albert Hall after dark','The building is lit up at night.'],['Dinner','Chokhi Dhani','A village-style Rajasthani dinner with folk performances.']],
+  eat:'Late snack run at Masala Chowk in Ram Niwas Bagh, if it is open.'},
+ {id:'crafts',title:'Crafts and block printing',sub:'Go to the source for what you buy.',w:{markets:3,culture:2,photography:1,food:1,forts:0},
+  stops:[['Morning','Sanganer block-printing workshops','Watch fabric being hand-stamped and washed.'],['Afternoon','Blue pottery studio','Jaipur\'s glazed ceramics, made in studios.'],['Evening','Bapu Bazaar','Shop for textiles and shoes with your new eye.']],
+  eat:'Dal kachori and a sweet at Sodhani or LMB on the way.'},
+ {id:'abhaneri',title:'Day trip to Abhaneri',sub:'Roughly 1.5 to 2 hours each way by road.',w:{photography:3,culture:2,forts:1,markets:0,food:0},
+  stops:[['Morning','Chand Baori stepwell','A deep stepwell with thousands of symmetrical steps.'],['Midday','Harshat Mata Temple','Next to the stepwell.'],['Afternoon','Drive back and rest','Take the evening off.']],
+  eat:'Carry water and snacks. Eat on the road back.'}
+];
+let state={days:3,interests:new Set(['forts','culture','food'])};
+function buildPlan(){
+  const scored=BLOCKS.map(b=>({b,s:[...state.interests].reduce((a,i)=>a+(b.w[i]||0),0)+(b.id==='city'?1.5:0)})).sort((x,y)=>y.s-x.s);
+  return scored.slice(0,state.days).map(x=>x.b);
+}
+function renderPlan(){
+  const el=$('#itinerary');const days=buildPlan();
+  el.innerHTML=days.map((d,i)=>`
+   <article class="day">
+     <h4>Day ${i+1}: ${d.title}</h4><p class="sub">${d.sub}</p>
+     <ol>${d.stops.map(s=>`<li><em>${s[0]}</em><b>${s[1]}</b>${s[2]}</li>`).join('')}</ol>
+     <div class="eat"><b>Eat:</b> ${d.eat}</div>
+   </article>`).join('');
+  $('#cDays').value=state.days;calc();
+  const txt='My Jaipur plan ('+state.days+' days)\n\n'+days.map((d,i)=>'Day '+(i+1)+': '+d.title+'\n'+d.stops.map(s=>'- '+s[0]+': '+s[1]).join('\n')+'\nEat: '+d.eat).join('\n\n');
+  $('#copyPlan').onclick=()=>copy(txt);
+  $('#waShare').href='https://wa.me/?text='+encodeURIComponent(txt);
+}
+function renderPickers(){
+  const dp=$('#dayPick');
+  [1,2,3,4,5].forEach(n=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=n+(n===1?' day':' days');b.setAttribute('aria-pressed',n===state.days);b.onclick=()=>{state.days=n;[...dp.querySelectorAll('.chip')].forEach((c,i)=>c.setAttribute('aria-pressed',i+1===n));renderPlan()};dp.appendChild(b)});
+  const ip=$('#interestPick');
+  INTERESTS.forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=l;b.setAttribute('aria-pressed',state.interests.has(k));b.onclick=()=>{state.interests.has(k)?state.interests.delete(k):state.interests.add(k);b.setAttribute('aria-pressed',state.interests.has(k));renderPlan()};ip.appendChild(b)});
+}
+
+/* ---------- calculator ---------- */
+function calc(){
+  const v=id=>Math.max(0,+$('#'+id).value||0);
+  const d=v('cDays'),p=v('cPeople'),r=v('cRooms');
+  const total=d*(r*v('cStay')+p*v('cFood')+v('cTrans')+p*v('cTix'));
+  $('#tTotal').textContent=inr(total);$('#tPP').textContent=inr(p?total/p:0);
+}
+['cDays','cPeople','cRooms','cStay','cFood','cTrans','cTix'].forEach(id=>$('#'+id).addEventListener('input',calc));
+
+/* ---------- food ---------- */
+const FOOD=[
+ {n:'Rawat Mishthan Bhandar',img:'food-kachori',a:'Station Road, near Sindhi Camp',t:['snack','sweet'],try:'Pyaaz kachori, mawa kachori, mirchi vada',tip:'Reported to sell around ten thousand kachoris a day. Go early for the freshest ones.',q:'Rawat Mishthan Bhandar Jaipur'},
+ {n:'Laxmi Misthan Bhandar (LMB)',img:'food-sweets',a:'Johari Bazaar',t:['sweet','sitdown','snack'],try:'Paneer ghewar, dal kachori, Rajasthani thali',tip:'A halwai shop that traces its history to 1727. Good for a proper sit-down meal in the old city.',q:'Laxmi Misthan Bhandar Johari Bazaar Jaipur'},
+ {n:'Lassiwala',img:'food-lassi',a:'MI Road, opposite Raj Mandir',t:['chai'],try:'Thick lassi in a kulhad',tip:'Serving lassi for over 70 years. It runs from morning to afternoon, so go early. Several shops use similar names, so look for the original.',q:'Lassiwala MI Road Jaipur'},
+ {n:'Gulab Ji Chai',img:'food-chai',a:'MI Road, near Ganpati Plaza',t:['chai','snack'],try:'Masala chai, bun maska, bun samosa',tip:'Serving since 1950, according to one guide. It runs from early morning to evening, so confirm closing time.',q:'Gulab Ji Chai Jaipur'},
+ {n:'Samrat',img:'food-kachori',a:'Chaura Rasta, Pink City',t:['snack'],try:'Samosa, kachori, dal pakwan, jalebi',tip:'A busy breakfast stop for flaky kachoris and crisp jalebis.',q:'Samrat Restaurant Chaura Rasta Jaipur'},
+ {n:'Puran Ji Kachori Wala',img:'food-puran',a:'Chaura Rasta',t:['snack'],try:'Hing kachori, dahi kachori',tip:'Known for the hing kachori. Cheap, quick and good.',q:'Puran Ji Kachori Wala Chaura Rasta Jaipur'},
+ {n:'Sampat Namkeen Bhandar',img:'food-sampat',a:'Chandpole Bazaar',t:['snack'],try:'Aloo kachori',tip:'Serving since 1936. Keep cash ready, online payments are not accepted.',q:'Sampat Namkeen Bhandar Chandpole Jaipur'},
+ {n:'Pandit Kulfi Bhandar',img:'food-kulfi',a:'Near Hawa Mahal',t:['sweet'],try:'Kesar kulfi, badam kulfi',tip:'A short walk from Hawa Mahal. Rich, dense and not too sweet.',q:'Pandit Kulfi Bhandar Jaipur'},
+ {n:'Masala Chowk',img:'food-street',a:'Ram Niwas Bagh',t:['street'],try:'Samosa, gol gappa, chole bhature, pizza omelette',tip:'An open-air food court with many vendors in one place. A small entry fee applies. Check hours before you go.',q:'Masala Chowk Ram Niwas Bagh Jaipur'},
+ {n:'Sahu Ki Chai',img:'food-sahu-chai',a:'Chaura Rasta',t:['chai'],try:'Morning chai',tip:'Local rival to Gulab Ji. Try both and pick your side.',q:'Sahu Ki Chai Chaura Rasta Jaipur'},
+ {n:'Murli Pan Bhandar',img:'food-paan',a:'Tripolia Bazaar',t:['street','sweet'],try:'Fire paan, chocolate paan',tip:'A popular stop after a meal, and the fire paan is the one to watch.',q:'Murli Pan Bhandar Tripolia Bazaar Jaipur'},
+ {n:'Falahaar',img:'food-shrikhand',a:'Saraogi Mansion',t:['sweet'],try:'Shrikhand',tip:'A small place known for shrikhand, a thick sweet yogurt dessert.',q:'Falahaar Saraogi Mansion Jaipur'},
+ {n:'Chokhi Dhani',img:'food-thali',a:'Edge of the city',t:['sitdown'],try:'A full Rajasthani thali with folk performances',tip:'A village-style dinner with folk dance, puppet shows and camel rides.',q:'Chokhi Dhani Jaipur'},
+ {n:'1135 AD',img:'food-1135',a:'Inside Amer Fort',t:['sitdown'],try:'A heritage lunch with fort views',tip:'A heritage restaurant if you are already at Amer. Reservations are wise.',q:'1135 AD Restaurant Amer Fort Jaipur'}
+];
+const FF=[['all','All'],['snack','Breakfast and snacks'],['sweet','Sweets and dessert'],['chai','Chai and lassi'],['street','Street food'],['sitdown','Sit-down meals']];
+let ff='all';
+function renderFood(){
+  const fl=$('#foodFilters');fl.innerHTML='';
+  FF.forEach(([k,l])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=l;b.setAttribute('aria-pressed',k===ff);b.onclick=()=>{ff=k;renderFood()};fl.appendChild(b)});
+  $('#joints').innerHTML=FOOD.filter(f=>ff==='all'||f.t.includes(ff)).map(f=>`
+    <article class="joint">
+      <div class="ph" data-slot="${f.img}" data-alt="${f.try.split(',')[0]} in Jaipur"></div>
+      <div class="b">
+        <h3>${f.n}</h3><p class="area">${f.a}</p>
+        <p class="try"><b>Try</b> ${f.try}</p><p class="tip">${f.tip}</p>
+        <div class="links"><a class="link" href="${maps(f.q)}" target="_blank" rel="noopener">Open in Maps</a><a class="link" href="${dirs(f.q)}" target="_blank" rel="noopener">Directions</a></div>
+      </div>
+    </article>`).join('');
+  document.querySelectorAll('#joints .ph').forEach(el=>{el.classList.add('hide');mountPhoto(el)});
+}
+
+/* ---------- travel ---------- */
+const ORIG=[['Delhi','DEL','NDLS','New Delhi'],['Mumbai','BOM','BCT','Mumbai Central'],['Bengaluru','BLR','SBC','KSR Bengaluru'],['Kolkata','CCU','HWH','Howrah'],['Chennai','MAA','MAS','Chennai Central'],['Hyderabad','HYD','SC','Secunderabad'],['Ahmedabad','AMD','ADI','Ahmedabad'],['Pune','PNQ','PUNE','Pune'],['Lucknow','LKO','LJN','Lucknow'],['Udaipur','UDR','UDZ','Udaipur City'],['Jodhpur','JDH','JU','Jodhpur']];
+(function(){
+  const f=$('#tFrom'),d=$('#tDate');
+  f.innerHTML=ORIG.map((o,i)=>`<option value="${i}">${o[0]}</option>`).join('');
+  const t=new Date();t.setDate(t.getDate()+14);const iso=x=>x.toISOString().slice(0,10);
+  d.min=iso(new Date());d.value=iso(t);
+  function upd(){
+    const o=ORIG[+f.value],dt=d.value;
+    $('#bFlight').href='https://www.google.com/travel/flights?q='+encodeURIComponent(`Flights from ${o[1]} to JAI on ${dt}`);
+    $('#bTrain').href='https://www.irctc.co.in/nget/train-search';
+    $('#bBus').href='https://www.redbus.in/';
+    $('#tTrain').textContent=`Train route to enter: ${o[3]} (${o[2]}) to Jaipur Jn (JP), date ${dt}.`;
+  }
+  f.onchange=d.onchange=upd;upd();
+})();
+
+
+/* ---------- real map ---------- */
+(function(){
+  const PINS=[['Amer Fort',26.9855,75.8513,'Amer Fort Jaipur'],['Jaigarh Fort',26.9851,75.8458,'Jaigarh Fort Jaipur'],['Jal Mahal',26.9535,75.8460,'Jal Mahal Jaipur'],['Nahargarh Fort',26.9373,75.8155,'Nahargarh Fort Jaipur'],
+   ['Hawa Mahal',26.9239,75.8267,'Hawa Mahal Jaipur'],['City Palace',26.9255,75.8236,'City Palace Jaipur'],['Jantar Mantar',26.9247,75.8245,'Jantar Mantar Jaipur'],['Johari Bazaar',26.9186,75.8270,'Johari Bazaar Jaipur'],
+   ['Albert Hall Museum',26.9119,75.8195,'Albert Hall Museum Jaipur'],['Masala Chowk',26.9132,75.8208,'Masala Chowk Jaipur']];
+  const list=document.getElementById('maplist'),el=document.getElementById('realmap');
+  list.innerHTML=PINS.map((p,i)=>`<li><button type="button" data-i="${i}"><b>${i+1}</b>${p[0]}</button></li>`).join('');
+  if(typeof L==='undefined'){el.innerHTML='<p style="padding:24px">The map could not load. Use the list to open each place in Google Maps.</p>';
+    list.querySelectorAll('button').forEach(b=>b.onclick=()=>window.open(maps(PINS[b.dataset.i][3]),'_blank','noopener'));return}
+  const map=L.map(el,{scrollWheelZoom:false,zoomControl:true});
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri'}).addTo(map);
+  const ms=PINS.map((p,i)=>{
+    const m=L.marker([p[1],p[2]],{icon:L.divIcon({className:'',html:`<div class="pin" id="pin${i}">${i+1}</div>`,iconSize:[30,30],iconAnchor:[15,15]}),title:p[0],keyboard:true}).addTo(map);
+    m.bindPopup(`<b>${p[0]}</b><br><a href="${maps(p[3])}" target="_blank" rel="noopener">Open in Google Maps</a>`);return m});
+  const all=()=>map.fitBounds(PINS.map(p=>[p[1],p[2]]),{padding:[40,40]});
+  const city=()=>map.fitBounds([[26.9119,75.8195],[26.9255,75.8270]],{padding:[60,60]});
+  all();document.getElementById('mapAll').onclick=all;document.getElementById('mapCity').onclick=city;
+  el.addEventListener('click',()=>map.scrollWheelZoom.enable());
+  list.querySelectorAll('button').forEach(b=>{const i=+b.dataset.i;
+    b.onclick=()=>{map.setView([PINS[i][1],PINS[i][2]],Math.max(map.getZoom(),14));ms[i].openPopup()};
+    b.onmouseenter=()=>document.getElementById('pin'+i)?.classList.add('on');b.onmouseleave=()=>document.getElementById('pin'+i)?.classList.remove('on')});
+  new IntersectionObserver((e,o)=>{if(e[0].isIntersecting){map.invalidateSize();o.disconnect()}}).observe(el);
+})();
+
+/* ---------- phrases ---------- */
+const PHR=[['नमस्ते','Namaste','Hello'],['धन्यवाद','Dhanyavaad','Thank you'],['कितने का है?','Kitne ka hai?','How much is this?'],['थोड़ा कम कीजिए','Thoda kam kijiye','Please reduce it a little'],['मिर्च कम','Mirch kam','Less chilli, please'],['मीटर से चलिए','Meter se chaliye','Please go by the meter'],['बिल दीजिए','Bill dijiye','The bill, please'],['पधारो म्हारे देस','Padharo mhare des','Welcome to my land (Rajasthani)']];
+$('#phrases').innerHTML=PHR.map(p=>`<button class="phrase" type="button" data-t="${p[1]}"><span class="dv" lang="hi">${p[0]}</span><span class="en">${p[1]}</span><small>${p[2]}</small></button>`).join('');
+$('#phrases').addEventListener('click',e=>{const b=e.target.closest('.phrase');if(b)copy(b.dataset.t)});
+
+/* ---------- repaint slider ---------- */
+const paint=$('#paint'),pr=$('#paintRange');
+pr.addEventListener('input',()=>paint.style.setProperty('--p',pr.value+'%'));
+
+/* ---------- nav ---------- */
+const mb=$('#menuBtn'),mn=$('#menu');
+mb.onclick=()=>{const o=mn.classList.toggle('open');mb.setAttribute('aria-expanded',o)};
+mn.addEventListener('click',e=>{if(e.target.tagName==='A'){mn.classList.remove('open');mb.setAttribute('aria-expanded','false')}});
+
+/* ---------- boot ---------- */
+renderPlaces();renderPickers();renderPlan();renderFood();
+document.querySelectorAll('.ph[data-slot]:not(.hide)').forEach(mountPhoto);
+</script>
+</body>
+</html>
